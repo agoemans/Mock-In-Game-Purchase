@@ -64,6 +64,49 @@
         button.refund:hover {
             background-color: #d32f2f;
         }
+
+        #shopItems .itemRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+        }
+
+        #shopItems .itemDetails {
+            flex: 1;
+        }
+
+        #shopItems button {
+            margin-left: 10px;
+        }
+
+        #errorSimContainer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #errorSimContainer h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #errorSimContainer button {
+            margin: 5px;
+            background-color: #555;
+            color: #fff;
+        }
+
+        #errorSimContainer button:hover {
+            background-color: #777;
+        }
     </style>
 </head>
 
@@ -82,9 +125,18 @@
         <div id="shopItems"></div>
     </div>
 
+    <div id="errorSimContainer" class="hidden">
+        <h2>Payment Error Simulation</h2>
+        <button onclick="simulatePurchaseError('PAYMENT_TIMEOUT')">Force Payment Timeout</button>
+        <button onclick="simulatePurchaseError('PAYMENT_DECLINED')">Force Payment Declined</button>
+        <button onclick="simulatePurchaseError('INSUFFICIENT_FUNDS')">Force Insufficient Funds</button>
+        <button onclick="simulateRefundError('PROVIDER_UNAVAILABLE')">Force Refund Provider Unavailable</button>
+    </div>
+
     <script src="ErrorManager.js" defer></script>
     <script src="MockGameSDK.js" defer></script>
     <script src="main.js" defer></script>
+
 </body>
 
 </html>

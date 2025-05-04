@@ -2,6 +2,7 @@ const loginBtn = document.getElementById('loginBtn');
 const loginScreen = document.getElementById('loginScreen');
 const shopScreen = document.getElementById('shopScreen');
 const shopItemsDiv = document.getElementById('shopItems');
+const errorSimContainer = document.getElementById('errorSimContainer');
 
 loginBtn.onclick = () => {
     MockGameSDK.login('player1', 'password');
@@ -10,6 +11,7 @@ loginBtn.onclick = () => {
 MockGameSDK.on('loginSuccess', (data) => {
     window.ErrorManager.logSuccess('Login successful!');
     loginScreen.classList.add('hidden');
+    errorSimContainer.classList.remove('hidden');
     shopScreen.classList.remove('hidden');
     loadShopItems();
 });
@@ -44,7 +46,13 @@ function loadShopItems() {
     MockGameSDK.getShopItems().then(items => {
         items.forEach(item => {
             const itemDiv = document.createElement('div');
-            itemDiv.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+            itemDiv.className = 'itemRow';
+
+            const itemDetails = document.createElement('div');
+            itemDetails.className = 'itemDetails';
+            itemDetails.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+
+            itemDiv.appendChild(itemDetails);
 
             // If item NOT purchased → show Buy button
             if (!item.purchased) {
@@ -55,7 +63,7 @@ function loadShopItems() {
                 };
                 itemDiv.appendChild(buyBtn);
 
-            // If item IS purchased → show Purchased label + Refund button
+                // If item IS purchased → show Purchased label + Refund button
             } else {
                 const purchasedLabel = document.createElement('span');
                 purchasedLabel.textContent = ' (Purchased)';
@@ -76,4 +84,14 @@ function loadShopItems() {
             shopItemsDiv.appendChild(itemDiv);
         });
     });
+}
+
+function simulatePurchaseError(code) {
+    MockGameSDK.simulateNextPurchaseError(code);
+    window.ErrorManager.logInfo(`Next purchase will fail with ${code}`);
+}
+
+function simulateRefundError(code) {
+    MockGameSDK.simulateNextRefundError(code);
+    window.ErrorManager.logInfo(`Next refund will fail with ${code}`);
 }
