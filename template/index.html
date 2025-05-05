@@ -36,9 +36,20 @@
         <button onclick="simulateRefundError('PROVIDER_UNAVAILABLE')">Force Refund Provider Unavailable</button>
     </div>
 
-    <script src="ErrorManager.js"></script>
-    <script src="MockGameSDK.js"></script>
-    <script src="main.js"></script>
+    <script src="ErrorManager.js" defer></script>
+    <script src="MockGameSDK.js" defer></script>
+    <script src="popup.js" defer></script>
+    <script src="main.js" defer></script>
+
+    <div id="popupOverlay">
+        <div id="popupBox">
+            <div id="popupMessage">Placeholder message</div>
+            <div id="popupButtons">
+                <button id="popupBtnNo">No</button>
+                <button id="popupBtnYes">Yes</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 

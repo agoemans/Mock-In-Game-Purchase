@@ -19,12 +19,14 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
+    src: url('images/avatar_guest.png'); 
 }
 
 #userBalance {
-    font-size: 18px;
+    font-size: 22px;
     display: flex;
     align-items: center;
+    font-weight: 500;
 }
 
 #shopTitle {
@@ -55,6 +57,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 365px;
 }
 
 .shopItem h3 {
@@ -90,6 +93,56 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
+
+#popupOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    /* Reset margin & padding in case body/page is affecting layout */
+    margin: 0;
+    padding: 0;
+    display: none;
+}
+
+#popupBox {
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    padding: 20px 30px;
+    text-align: center;
+    color: #fff;
+    max-width: 400px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+#popupMessage {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+#popupButtons button {
+    background-color: #555;
+    color: white;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#popupButtons button:hover {
+    background-color: #777;
+}
+
+.hidden {
+    display: none;
+}
+
 
 #errorSimContainer h2 {
     font-size: 18px;

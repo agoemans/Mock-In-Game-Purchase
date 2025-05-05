@@ -1,20 +1,26 @@
-// const loginBtn = document.getElementById('loginBtn');
 const loginScreen = document.getElementById('loginScreen');
 const shopScreen = document.getElementById('shopScreen');
 const shopItemsDiv = document.getElementById('shopItems');
 const errorSimContainer = document.getElementById('errorSimContainer');
 
-// loginBtn.onclick = () => {
-//     MockGameSDK.login('player1', 'password');
-// };
 
 MockGameSDK.on('loginSuccess', (data) => {
     window.ErrorManager.logSuccess('Login successful!');
-    loginScreen.classList.add('hidden');
-    errorSimContainer.classList.remove('hidden');
-    shopScreen.classList.remove('hidden');
     loadShopItems();
 });
+
+//ToDO separate all responsibilities
+function updateAvatar() {
+    const balance = MockGameSDK.getPlayerBalance();
+    const avatar = document.getElementById('avatar');
+
+    if (!MockGameSDK._player.userId) {
+        avatar.src = 'images/avatar_guest.png';
+        return;
+    }
+
+    avatar.src = 'images/avatar_happy.png';
+}
 
 function updateBalanceDisplay() {
     const balance = MockGameSDK.getPlayerBalance();
@@ -36,22 +42,19 @@ function updateBalanceDisplay() {
     balanceContainer.appendChild(coinImg);
     balanceContainer.appendChild(balanceText);
 
-    const avatar = document.getElementById('avatar');
+    updateAvatar();
 
-    if (balance >= 15) {
-        avatar.src = 'images/avatar_happy.png'; // Rich
-    } else if (balance >= 5) {
-        avatar.src = 'images/avatar_neutral.png'; // Normal
-    } else {
-        avatar.src = 'images/avatar_sad.png'; // Poor
-    }
+
 }
 
-function loadShopItems() {
+async function loadShopItems() {
     const shopContainer = document.getElementById('shopContainer');
     shopContainer.innerHTML = '';
 
-    MockGameSDK.getShopItems().then(items => {
+    updateAvatar();
+
+    let items  = await MockGameSDK.getShopItems();
+    if(items) {
         items.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'shopItem';
@@ -72,22 +75,40 @@ function loadShopItems() {
             image.src = 'images/' + item.image; // Placeholder image
             itemDiv.appendChild(image);
 
+            const purchasedLabel = document.createElement('span');
+            purchasedLabel.textContent = 'Purchased';
+            purchasedLabel.style.color = '#0f0';
+            itemDiv.appendChild(purchasedLabel);
+
             if (!item.purchased) {
+                purchasedLabel.style.display = 'none';
                 const buyBtn = document.createElement('button');
                 buyBtn.textContent = 'BUY';
+                buyBtn.style.backgroundColor = '#4caf50';
                 buyBtn.onclick = () => {
-                    MockGameSDK.buyItem(item.id);
+                    //change this to read data from the sdk
+                    if (!MockGameSDK._player.userId) {
+                        popup.show(
+                            'You need to log in for purchases. Log in?',
+                            () => {  // Yes clicked
+                                performLoginAndBuy(item.id);
+                            },
+                            () => {  // No clicked
+                                window.ErrorManager.logInfo('Purchase cancelled by user.');
+                            }
+                        );
+                    } else {
+                        MockGameSDK.buyItem(item.id);
+                    }
                 };
                 itemDiv.appendChild(buyBtn);
             } else {
-                const purchasedLabel = document.createElement('span');
-                purchasedLabel.textContent = 'Purchased';
-                purchasedLabel.style.color = '#0f0';
-                itemDiv.appendChild(purchasedLabel);
+                purchasedLabel.style.display = 'block';
 
                 const refundBtn = document.createElement('button');
-                refundBtn.textContent = 'Refund';
+                refundBtn.textContent = 'REFUND';
                 refundBtn.style.marginTop = '5px';
+                refundBtn.style.backgroundColor = '#ff1919';
                 refundBtn.onclick = () => {
                     MockGameSDK.refundItem(item.id);
                 };
@@ -96,24 +117,35 @@ function loadShopItems() {
 
             shopContainer.appendChild(itemDiv);
         });
-    });
+    }
+
+    // MockGameSDK.getShopItems().then(items => {
+        
+    // });
 
     updateBalanceDisplay();
 }
 
+function performLoginAndBuy(itemId) {
+    MockGameSDK.login('player1', 'password').then(() => {
+
+        MockGameSDK.buyItem(itemId);
+    });
+}
+
 // Hook up all the events
-MockGameSDK.on('purchaseCompleted', (data) => {
+MockGameSDK.on('purchaseCompleted', async (data) => {
     window.ErrorManager.logSuccess(`Purchase successful: ${data.itemId}`);
-    loadShopItems();
+    await loadShopItems();
 });
 
 MockGameSDK.on('purchaseFailed', (err) => {
     window.ErrorManager.logError(`Purchase failed: ${err.message} (${err.code})`);
 });
 
-MockGameSDK.on('refundCompleted', (data) => {
+MockGameSDK.on('refundCompleted', async (data) => {
     window.ErrorManager.logSuccess(`Refund successful: ${data.itemId}, refunded $${data.amountRefunded.toFixed(2)}`);
-    loadShopItems();
+    await loadShopItems();
 });
 
 MockGameSDK.on('refundFailed', (err) => {
@@ -121,8 +153,8 @@ MockGameSDK.on('refundFailed', (err) => {
 });
 
 /// on start
-window.addEventListener('load', () => {
-    loadShopItems();
+window.addEventListener('load', async () => {
+    await loadShopItems();
 });
 
 function simulatePurchaseError(code) {
