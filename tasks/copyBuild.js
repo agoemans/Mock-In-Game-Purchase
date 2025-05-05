@@ -20,9 +20,11 @@ function copyFolderSync(source, destination) {
     }
 }
 
+
+// note it is getting to the point I set up rollup: TODO
 function copyBuild() {
-    const foldersToCopy = ['template', 'src', 'sdk', 'libs'];
-    const distFolder = path.join(process.cwd(), 'dist');
+    const foldersToCopy = ['template', 'src', 'sdk', 'libs', 'css', 'images'];
+    const distFolder = path.join(process.cwd(), '_dist');
 
     if (!fs.existsSync(distFolder)) {
         fs.mkdirSync(distFolder, { recursive: true });
@@ -32,7 +34,13 @@ function copyBuild() {
         const sourceFolder = path.join(process.cwd(), folder);
 
         if (fs.existsSync(sourceFolder)) {
-            copyFolderSync(sourceFolder, distFolder); // Flatten by using the same distFolder
+            if (folder === 'images') {
+                const imagesDestination = path.join(distFolder, folder);
+                copyFolderSync(sourceFolder, imagesDestination); // Copy the folder as-is
+            } else {
+                copyFolderSync(sourceFolder, distFolder); // Flatten by using the same distFolder
+            }
+            
         } else {
             console.warn(`Source folder "${folder}" does not exist.`);
         }
